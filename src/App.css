@@ -31,9 +31,14 @@
   z-index: 3;
 }
 #ipInput {
-  width: 50%;
+  width: 80%;
   height: 20%;
   border-radius: 10px;
+  font-size: medium;
+padding: 20px;
+}
+.inputDiv{
+  width: 30%;
 }
 
 .details {
@@ -80,7 +85,7 @@
     align-items: center;
     margin-left: 10%;
     border: 1px solid black;
-    height: 20%;
+    height: 35%;
     margin-top: -42px;
     background-color: white;
     border-radius: 20px;
@@ -91,5 +96,12 @@
     height: 100%;
     width: 100%;
     margin-top: -28%;
+  }
+  .vertical-line {
+
+    height: 1px;
+    width: 20%;
+   
+    background-color: silver;
   }
 }
