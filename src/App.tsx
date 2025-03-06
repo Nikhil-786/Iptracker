@@ -96,7 +96,7 @@ function App() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button onClick={handleGetIPDetails}>FIND</button>
+          <button id="find" onClick={handleGetIPDetails}>FIND</button>
         </div>
       </div>
       <div className="details">

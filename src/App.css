@@ -39,6 +39,11 @@ padding: 20px;
 }
 .inputDiv{
   width: 30%;
+  display: flex;
+}
+#find{
+  width: 5em;
+  height: 2.5em;
 }
 
 .details {
