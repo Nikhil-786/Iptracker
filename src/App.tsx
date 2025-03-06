@@ -1,16 +1,50 @@
 import "./App.css";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "../node_modules/leaflet/dist/leaflet.css";
 import pointer from "./images/icon-location.svg";
 import l from "leaflet";
-import { Map } from "leaflet";
 
 function App() {
-  const [data, setAPIDATA] = useState({});
+  // Define the interface for the location object
+  interface Location {
+    country: string;
+    region: string;
+    timezone: string;
+    lat: number;
+    lng: number;
+  }
+
+  // Define the interface for the AS object
+  interface ASInfo {
+    asn: number;
+    name: string;
+    route: string;
+    domain: string;
+    type: string;
+  }
+
+  // Define the interface for the main API response
+  interface IPData {
+    ip: string;
+    location: Location;
+    domains: string[]; // Array of strings
+    as: ASInfo;
+    isp: string;
+  }
+
+  const [data, setAPIDATA] = useState<IPData | null>(null);
   const [input, setInput] = useState("");
 
+  interface Coordinates {
+    latitude: number;
+    longitude: number;
+  }
 
+  interface SearchLocationProps {
+    location: Coordinates;
+    search: string;
+  }
   const icon = new l.Icon({
     iconUrl: pointer,
     iconSize: [35, 45],
@@ -19,20 +53,32 @@ function App() {
   });
 
   const apiKey = import.meta.env.VITE_API_KEY;
-  console.log(apiKey);
+
   const handleGetIPDetails = async () => {
-    const data = await fetch(
-    //  `https://geo.ipify.org/api/v2/country,city,vpn?apiKey=${apiKey}&ipAddress=${input}`
-    );
-    const jsondata = await data.json();
-    setAPIDATA(jsondata);
+    try {
+      const data = await fetch(
+        `https://geo.ipify.org/api/v2/country,city,vpn?apiKey=${apiKey}&ipAddress=${input}`
+      );
+      const jsondata = await data.json();
+      setAPIDATA(jsondata);
+    } catch (error) {
+      console.log("Error fetching data" + error);
+    }
   };
 
-  function SearchLocation({ location, search }) {
+  function SearchLocation({ location, search }: SearchLocationProps) {
     const map = useMap();
-    if (location) map.flyTo(location, 12);
+    if (location) map.flyTo([location.latitude, location.longitude], 12);
     return location ? (
-      <Marker draggable position={location} icon={icon}>
+      <Marker
+        draggable
+        position={
+          location
+            ? [location.latitude, location.longitude] // Convert {latitude, longitude} to [lat, lng]
+            : [0, 0]
+        }
+        icon={icon}
+      >
         <Popup>You are here:{search}</Popup>
       </Marker>
     ) : null;
@@ -70,13 +116,13 @@ function App() {
         <div className="childDetails">
           <label htmlFor="">TIMEZONE</label>
           <br />
-          <b>{data.location?.timezone}</b>
+          <b>{data?.location?.timezone}</b>
         </div>
         <div className="vertical-line"></div>
         <div className="childDetails">
           <label htmlFor="">ISP</label>
           <br />
-          <b>{data.as?.name}</b>
+          <b>{data?.as?.name}</b>
         </div>
       </div>
       <div className="map">
@@ -91,7 +137,12 @@ function App() {
           />
           <SearchLocation
             location={
-              data?.location?.lat && [data.location.lat, data.location.lng]
+              data?.location?.lat && data?.location?.lng
+                ? {
+                    latitude: data?.location.lat,
+                    longitude: data?.location.lng,
+                  }
+                : { latitude: 0, longitude: 0 } // Fallback coordinates (lat, lng)
             }
             search={input}
           />
